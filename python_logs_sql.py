@@ -9,13 +9,12 @@ import sqlite3
 from pymysql import Connection as connection
 from sys import exit
 import passwd_local
-
+import logging
 
 db_file = 'prx.db'
 
 
 def mysql_database():
-
     return connection(unix_socket='/var/run/mysqld/mysqld.sock', user=passwd_local.db_user, password=passwd_local.db_pass, db=passwd_local.db_name)
 
 
@@ -87,14 +86,9 @@ def prepare_log_from_file(log, database):
         send = item[9]
         proto = item[10]
         url = item[11]
-        # r_host_tmp = (res(
-        #     '^[htp]{0,4}[s]?[\:\/\/]{0,3}([\w\.\-]*)', url).groups()[0]).split(".")
-        # print(r_host_tmp)
-        # r_host=r_host_tmp[-2] + "." + r_host_tmp[-1]
         r_host = res(
             '^[htp]{0,4}[s]?[\:\/\/]{0,3}([\w\.\-]*)', url).groups()[0]
         status = item[13]
-        # print(r_host)
         return (server, client_username, client_time,
                 client_ip, r_ip, int(r_port), int(recv), int(send), status, r_host, url)
 
@@ -106,25 +100,27 @@ def prepare_log_from_file(log, database):
         return True
     lines_counter = 0
     with open(log, 'r') as f:
+        start_time = time()
         while True:
             lines_counter += 1
-            # print(lines_counter)
-            # print(lines_counter)
             line = f.readline()
             if line == '':
                 break
             if check_lines(line) is True:
                 current_line = parse(line)
-                # print(current_line)
                 try:
                     database_cursor.execute(
                         'insert into prx values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', current_line)
                 except:
-                    print()
-                    # print(current_line)
-                if lines_counter == 10000:
-                    lines_counter = 0
+                    logging.debug(current_line)
+                if lines_counter % 100 == 0:
                     database.commit()
+                    end_time = time()
+                    delta_time = end_time - start_time
+                    msg = '100 walked in ' + str(delta_time) + " seconds"
+                    logging.info(msg)
+                    start_time = time()
+
             else:
                 continue
 
@@ -136,10 +132,11 @@ def prepare_log_from_file(log, database):
 
 mysq_recreate_tables(mysql_database())
 
-# prepare_log_from_file('LOGS/LOG1', mysql_database())
+logging.basicConfig(filename='current_' + str(time()) +
+                    ".log", level=logging.DEBUG)
+
 for filea in filelist(folder):
-    # print(filea)
-    t = time()
-    print(t)
+    # t = time()
+    # print(t)
     prepare_log_from_file(filea[0] + "/" + filea[1], mysql_database())
-    print(time() - t)
+    # print(time() - t)
