@@ -113,7 +113,7 @@ def prepare_log_from_file(log, database):
                         'insert into prx values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', current_line)
                 except:
                     logging.debug(current_line)
-                if lines_counter % 100 == 0:
+                if lines_counter % 10000 == 0:
                     database.commit()
                     end_time = time()
                     delta_time = end_time - start_time
