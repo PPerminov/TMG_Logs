@@ -115,7 +115,7 @@ def logs_parse(LOG, DB=None):
     DB.commit()
     DB_cur.close()
 
-    DB.close()
+
     print(time() - t, 'to commit to SQL')
 
 
@@ -128,6 +128,8 @@ for filea in filelist(folder):
     # t = time()
     # print(t)
     logs_parse(filea[0] + "/" + filea[1], mysql_database())
+D1.commit()
+D1.close()
 # print(time() - t)
 # logs_parse('LOGS/ISALOG_20171005_WEB_000.w3c', mysql_database())
 
