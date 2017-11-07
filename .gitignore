@@ -1,4 +1,5 @@
 LOGS/
+LOGA/
 prx.db
 __pycache__/
 passwd_local.py
