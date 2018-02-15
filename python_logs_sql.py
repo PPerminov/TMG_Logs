@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from os.path import dirname, islink, realpath, abspath
-from os import walk, remove
+from os.path import islink, realpath, abspath
+from os import remove
 from time import time
 from re import search as res
 from sys import exit
@@ -8,6 +8,10 @@ import variables
 import inspect
 import logging
 import multiprocessing as mp
+
+
+# def FieldsParser(fields):
+#     print()
 
 
 def log(type, func_name, status, start_time, end_time=None, extra_msg=''):
@@ -29,11 +33,25 @@ def log(type, func_name, status, start_time, end_time=None, extra_msg=''):
     return start_time
 
 
-def mysql_database():
+def connect_database(DB=None, sqlite=None):
     func_name = inspect.getframeinfo(inspect.currentframe()).function
-    log('info', func_name, 'started', time())
+    stime = log('info', func_name, 'started', time())
+    if sqlite:
+        # print(2131241)
+        from sqlite3 import Connection
+        DB = Connection(sqlite)
+        log('info', func_name, 'close DB', stime, time())
+        return DB
+    if DB:
+        DB.commit()
+        DB.close()
+        log('info', func_name, 'close DB', stime, time())
+        return
     from pymysql import Connection as connection
-    return connection(unix_socket='/var/run/mysqld/mysqld.sock', user=variables.db_user, password=variables.db_pass, db=variables.db_name)
+    DB = connection(unix_socket='/var/run/mysqld/mysqld.sock',
+                    user=variables.db_user, password=variables.db_pass, db=variables.db_name)
+    log('info', func_name, 'started', time(), stime)
+    return DB
 
 
 def mysq_recreate_tables(database):
@@ -60,8 +78,9 @@ def mysq_recreate_tables(database):
 def filelist(folder):
     func_name = inspect.getframeinfo(inspect.currentframe()).function
     stime = log('info', func_name, 'started', time())
+    from os import walk, path
     file_list = list()
-    for root, subdirs, file_name in walk(abspath(folder)):
+    for root, subdirs, file_name in walk(path.abspath(folder)):
         if file_name:
             for fn in file_name:
                 file_list.append(root + "/" + fn)
@@ -97,7 +116,6 @@ def logs_parse(LOG):
     func_name = inspect.getframeinfo(inspect.currentframe()).function
     stime = log('info', func_name, 'started', time(), extra_msg=LOG)
     DB_cur = DB.cursor()
-    starttime = time()
     lines_array = list()
 #    msg = 'File read and parse started - ' + LOG + ' - ' + str(starttime)
 #    logging.info(msg)
@@ -120,11 +138,12 @@ def logs_parse(LOG):
             DB_cur.execute(
                 'insert into prx values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', item)
         except:
-            logging.debug(''.join(item))
+            mapped = map(lambda x: str(x), item)
+            logging.debug(''.join(mapped))
 
     end_time = time()
   #  print('commited in', end_time - t)
-    log('info', func_name, 'ended', time(), end_time)
+    log('info', func_name, 'ended', stime, end_time)
   #  logging.info('completed file ' + LOG + ' in ' +
     # str(end_time - starttime) + ' seconds')
     DB_cur.close()
@@ -139,22 +158,18 @@ def killall():
 
 
 if __name__ == '__main__':
-    root_dir = dirname(abspath(__file__))
-    logging.basicConfig(filename=abspath(root_dir + variables.logs_folder) + '/current_' + str(time()) +
-                        ".log", level=logging.DEBUG)
+    logging.basicConfig(filename=abspath(variables.logs_folder) +
+                        '/current_' + str(time()) + ".log", level=logging.DEBUG)
     try:
-        DB = mysql_database()
-        mysq_recreate_tables(DB)
-        files = filelist(variables.source_folder)
-        # f_pool = mp.Pool(mp.cpu_count()-1)
-        f_pool = mp.Pool(4)
+        DB = connect_database(sqlite="file.db")
+        # mysq_recreate_tables(DB)
+        # files = filelist(variables.source_folder)
+        files = ['LOGS/ISALOG_20170919_WEB_000.w3c']
+        # print(files)
+        f_pool = mp.Pool(1)
         f_pool.map(logs_parse, files)
-        f_pool.join()
         f_pool.close()
-        try:
-            DB.commit()
-        except:
-            log.debug('commit problems')
-        DB.close()
+        f_pool.join()
+        connect_database(DB)
     except KeyboardInterrupt:
         killall()

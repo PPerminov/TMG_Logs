@@ -4,3 +4,5 @@ prx.db
 __pycache__/
 variables.py
 *.log
+*.w3c
+*.db
