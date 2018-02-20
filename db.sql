@@ -67,6 +67,8 @@ softblockaction varchar(255));
 
 CREATE INDEX c__ip_index ON proxies.tmp (c__ip);
 CREATE INDEX username_index ON proxies.tmp (cs__username);
+CREATE INDEX date_index on proxies.tmp (date);
+CREATE INDEX time_index on proxies.tmp (time);
 
 
 -- CREATE INDEX c__ip_index ON tmp (c__ip);
