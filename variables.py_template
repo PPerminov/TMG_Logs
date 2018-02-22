@@ -1,5 +1,0 @@
-db_name = ''
-db_pass = ''
-db_user = ''
-logs_folder = '.'
-source_folder = ''

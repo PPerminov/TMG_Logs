@@ -92,7 +92,7 @@ def config(config_file='config.ini'):
         create_new_config()
     else:
         config.read(config_file)
-    if check_config():
+    if check_config(config,params):
         return config
     else:
         return

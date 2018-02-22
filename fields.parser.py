@@ -5,6 +5,7 @@ import sys
 import os
 import local_config
 
+
 def parser(params):
     file1 = params['file1']
     config = params['config']
@@ -21,54 +22,61 @@ def parser(params):
     tmp_lines = []
     counter = 0
     t = time()
+    values = []
     with open(file1, 'r') as r:
         while True:
-            t=time()
+            t = time()
             try:
                 x = (r.readline()).strip()
                 if x is None or x == '':
-                    sql.commit()
+                    cursor.executemany(current_query, values)
                     break
             except:
+                sql.commit()
                 break
             if x[0] == '#':
                 if 'Fields' in x:
+                    try:
+                        cursor.executemany(current_query, values)
+                        values = []
+                    except:
+                        print('!!!')
                     fields = {}
-                    array = (re.sub(r'-', '__', re.sub(r' ', '__', re.sub(r'^#fields: ',
-                                                                          '', x.lower().split("\n")[0])))).split('\t')
+                    fields_array = (re.sub(r'-', '__', re.sub(r' ', '__', re.sub(r'^#fields: ',
+                                                                                 '', x.lower().split("\n")[0])))).split('\t')
                     position = 0
-                    for item in array:
+                    for item in fields_array:
                         fields[item] = position
                         position += 1
+                    marks = ','.join(['%s' for _ in fields_array])
+                    names = ','.join(fields_array)
+                    current_query = 'insert into tmp (' + \
+                        names + ') values (' + marks + ');'
                 continue
-            tm = {}
-            tm_names = []
             tm_values = []
             line = x.split("\t")
-            for field in proxy_fields:
-
+            for field in fields_array:
+                position_t = fields[field]
+                data = line[position_t]
                 try:
-
-                    position_t = fields[field]
-                    if line[position_t] == "-":
-                        pass
-                    else:
+                    if data != '-':
                         result = re.sub(r'\\', r'\\\\', re.sub(
-                            r'"', "'", (line[position_t])))
-                    tm_values.append('"' + result + '"')
-                    tm_names.append(field)
+                            r'"', "'", (data)))
+                    else:
+                        result = 'null'
+                    tm_values.append(result.encode())
                 except:
                     pass
-            names = (', '.join(tm_names))
-            values = (', '.join(tm_values))
-            qry = ("Insert Into tmp (%s) Values (%s);\n" %
-                   (names, values)).encode()
-            cursor.execute(qry)
+            values.append(tuple(tm_values))
             counter += 1
-            ccg=100000
+            ccg = 10000
             if counter % ccg == 0:
-                # print('{0:.10f}'.format(((time()-t)/ccg)))
+                cursor.executemany(current_query, values)
+                values = []
+
+                print('{0:.10f}'.format(((time() - t) / ccg)))
                 sql.commit()
+    sql.commit()
 
 
 def start():
