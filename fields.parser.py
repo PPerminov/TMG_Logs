@@ -5,13 +5,7 @@ import sys
 import os
 import local_config
 
-# class parser:
-#     def __init__(self):
-
-
 def parser(params):
-    qry=''
-    fooo=open('result.txt','w')
     file1 = params['file1']
     config = params['config']
     proxy_fields = (config.get('Fields', 'proxy_fields')).split(' ')
@@ -72,19 +66,15 @@ def parser(params):
             cursor.execute(qry)
             counter += 1
             ccg=100000
-        # fooo.write(qry)
             if counter % ccg == 0:
-                # print(counter)
-                print('{0:.10f}'.format(((time()-t)/ccg)))
+                # print('{0:.10f}'.format(((time()-t)/ccg)))
                 sql.commit()
 
 
 def start():
     files = []
     config = local_config.config()
-
     directory = os.path.realpath(config.get('Source', 'source'))
-    # print(directory)
     all_list = os.walk(directory)
     for dirpath, dirnames, filenames in all_list:
         for fileitem in filenames:
