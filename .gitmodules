@@ -1,0 +1,3 @@
+[submodule "project-lvl1-s98"]
+	path = vendor/project-lvl1-s98
+	url = git@github.com:PPerminov/project-lvl1-s98.git
