@@ -9,7 +9,6 @@ from getpass import getpass
 
 
 class parser:
-
     def __init__(self, config_file='config.ini'):
         self.config_file = config_file
         self.config()
