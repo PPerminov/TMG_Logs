@@ -1,1 +1,26 @@
 buildPack: python
+pipelineConfig:
+  pullRequest:
+    preBuild:
+      pipeline:
+        agent:
+          image: ubuntu
+          stages:
+            - name: Stage With Steps And Options Etc
+              # agent, options, and environment are valid on stages as well. For the parents of nested
+              # sequential or parallel stages, their children inherit the parent's agent, options,
+              # and environment.
+              # options on a stage currently only can contain containerOptions.
+              options:
+                containerOptions:
+                  resources:
+                    limits:
+                      cpu: 0.4
+                      memory: 256Mi
+              # A stage must contain at least one of "steps", "stages", or "parallel"
+              # Steps must contain at least one command to be executed or a loop.
+              steps:
+                - command: ls
+                  # args are a YAML array, so can be specified either on multiple lines or in a []
+                  args:
+                    - -la
