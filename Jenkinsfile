@@ -30,6 +30,7 @@ spec:
     stage('Build Docker image') {
       container('ubuntu') {
         sh "ls -lah"
+        sh "printenv | sort -u"
       }
     }
   }
