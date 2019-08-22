@@ -30,7 +30,7 @@ spec:
     stage('Build Docker image') {
       git 'https://github.com/jenkinsci/docker-jnlp-slave.git'
       container('ubuntu') {
-        sh "bash run.sh"
+        sh "ls -lah"
       }
     }
   }
