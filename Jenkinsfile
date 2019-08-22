@@ -27,7 +27,7 @@ spec:
       git 'https://github.com/jenkinsci/docker-jnlp-slave.git'
       container('docker') {
         sh "docker build -t ${image} ."
-        sh "a=20000 && while  [[ $a -ne 0 ]] ; do a=`echo $a - 1 | bc ` && echo $a ; done"
+        sh "bash run.sh"
       }
     }
   }
