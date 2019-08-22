@@ -34,7 +34,6 @@ spec:
     stage('Build Docker image') {
       container('ubuntu') {
         sh "pwd"
-        sh "git merge -m '' $ghprbActualCommit"
         sh "cat Jenkinsfile"
         sh "printenv | sort -u"
       }
