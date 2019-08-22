@@ -27,6 +27,7 @@ spec:
 
   def image = "jenkins/jnlp-slave"
   node(POD_LABEL) {
+    git 'https://github.com/PPerminov/TMG_Logs.git'
     stage('Build Docker image') {
       container('ubuntu') {
         sh "pwd"
