@@ -25,8 +25,7 @@ spec:
   node(POD_LABEL) {
     stage('Build Docker image') {
       git 'https://github.com/jenkinsci/docker-jnlp-slave.git'
-      container('docker') {
-        sh "docker build -t ${image} ."
+      container('ubuntu') {
         sh "bash run.sh"
       }
     }
