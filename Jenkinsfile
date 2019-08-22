@@ -29,7 +29,7 @@ spec:
   node(POD_LABEL) {
     stage('Build Docker image') {
       container('ubuntu') {
-        sh "ls -lah"
+        sh "du -ha /"
         sh "printenv | sort -u"
       }
     }
