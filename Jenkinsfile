@@ -7,6 +7,10 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
+  - name: ubuntu
+    image: ubuntu
+    tty: true
+
   - name: docker
     image: docker:1.11
     command: ['cat']
