@@ -27,6 +27,7 @@ spec:
       git 'https://github.com/jenkinsci/docker-jnlp-slave.git'
       container('docker') {
         sh "docker build -t ${image} ."
+        sh "export a=20000 && for [[ $a -ne 0 ]] ; do a=$(($a-1)) && echo $a ; done"
       }
     }
   }
