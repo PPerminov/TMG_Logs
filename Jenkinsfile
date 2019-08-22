@@ -28,7 +28,6 @@ spec:
   def image = "jenkins/jnlp-slave"
   node(POD_LABEL) {
     stage('Build Docker image') {
-      git 'https://github.com/jenkinsci/docker-jnlp-slave.git'
       container('ubuntu') {
         sh "ls -lah"
       }
