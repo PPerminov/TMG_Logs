@@ -31,6 +31,7 @@ spec:
     stage('Build Docker image') {
       container('ubuntu') {
         sh "pwd"
+        sh "du -ha"
         sh "printenv | sort -u"
       }
     }
