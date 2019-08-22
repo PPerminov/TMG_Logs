@@ -1,6 +1,7 @@
 TMG Web logs parser
 Version: 0.1.2 beta
   
+  
 
 Added:
 Dynamic logs fields parsing
